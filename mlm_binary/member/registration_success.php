@@ -1,103 +1,107 @@
 <?php
 require_once '../includes/header.php';
 
-// Get referral code from URL
-$referral_code = isset($_GET['ref']) ? htmlspecialchars($_GET['ref']) : '';
-$referral_link = 'http://' . $_SERVER['HTTP_HOST'] . '/mlm_binary/member/register.php?ref=' . $referral_code;
+// Check if registration data exists in session
+if (!isset($_SESSION['registration_success']) || !isset($_SESSION['user_data'])) {
+    header("Location: register.php");
+    exit;
+}
+
+$user_data = $_SESSION['user_data'];
+
+// Clear registration session data after displaying
+unset($_SESSION['registration_success']);
+unset($_SESSION['user_data']);
 ?>
 
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card text-center">
-                <div class="card-body p-5">
+            <div class="card border-0 shadow">
+                <div class="card-body text-center p-5">
                     <div class="mb-4">
-                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                        <i class="fas fa-check-circle text-success fa-5x"></i>
                     </div>
-                    <h2 class="card-title mb-4">Pendaftaran Berhasil!</h2>
-                    <p class="card-text lead mb-4">
+                    
+                    <h2 class="mb-4">Pendaftaran Berhasil!</h2>
+                    
+                    <p class="lead mb-4">
                         Selamat bergabung di MLM Binary System. Akun Anda telah berhasil dibuat.
                     </p>
-                    
-                    <?php if ($referral_code): ?>
-                    <div class="mb-4">
-                        <h4>Kode Referral Anda</h4>
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" value="<?php echo $referral_code; ?>" readonly>
-                            <button class="btn btn-outline-primary" type="button" onclick="copyToClipboard('<?php echo $referral_code; ?>')" data-bs-toggle="tooltip" data-bs-title="Salin Kode">
+
+                    <div class="alert alert-info mb-4">
+                        <h5 class="mb-3">Informasi Akun:</h5>
+                        <p class="mb-2">
+                            <strong>Username:</strong> <?php echo htmlspecialchars($user_data['username']); ?>
+                        </p>
+                        <p class="mb-2">
+                            <strong>Paket:</strong> <?php echo ucfirst(htmlspecialchars($user_data['package_type'])); ?>
+                        </p>
+                        <p class="mb-0">
+                            <strong>Kode Referral:</strong> 
+                            <span class="user-select-all"><?php echo htmlspecialchars($user_data['referral_code']); ?></span>
+                            <button class="btn btn-sm btn-outline-primary ms-2" 
+                                    onclick="copyToClipboard('<?php echo htmlspecialchars($user_data['referral_code']); ?>')"
+                                    data-bs-toggle="tooltip" 
+                                    title="Salin Kode">
                                 <i class="fas fa-copy"></i>
                             </button>
-                        </div>
+                        </p>
                     </div>
-                    
-                    <div class="mb-4">
-                        <h4>Link Referral Anda</h4>
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" value="<?php echo $referral_link; ?>" readonly>
-                            <button class="btn btn-outline-primary" type="button" onclick="copyToClipboard('<?php echo $referral_link; ?>')" data-bs-toggle="tooltip" data-bs-title="Salin Link">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <small class="text-muted">Bagikan link ini untuk mengundang member baru</small>
+
+                    <div class="alert alert-warning mb-4">
+                        <h5 class="mb-3">Langkah Selanjutnya:</h5>
+                        <ol class="text-start mb-0">
+                            <li class="mb-2">Login ke akun Anda</li>
+                            <li class="mb-2">Lengkapi profil Anda</li>
+                            <li class="mb-2">Mulai bangun jaringan Anda</li>
+                            <li>Bagikan kode referral Anda</li>
+                        </ol>
                     </div>
-                    <?php endif; ?>
-                    
-                    <div class="d-grid gap-3">
-                        <a href="login.php" class="btn btn-primary btn-lg">Masuk ke Akun</a>
-                        <a href="../index.php" class="btn btn-outline-primary">Kembali ke Beranda</a>
+
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                        <a href="login.php" class="btn btn-primary btn-lg px-4">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login Sekarang
+                        </a>
+                        <a href="../index.php" class="btn btn-outline-secondary btn-lg px-4">
+                            <i class="fas fa-home me-2"></i>Kembali ke Beranda
+                        </a>
                     </div>
                 </div>
             </div>
-            
-            <!-- Quick Start Guide -->
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h4 class="card-title mb-4">Panduan Cepat Memulai</h4>
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-start">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px;">
-                                    <span>1</span>
-                                </div>
-                                <div>
-                                    <h5>Masuk ke Akun</h5>
-                                    <p class="mb-0">Login menggunakan username dan password yang telah didaftarkan</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-start">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px;">
-                                    <span>2</span>
-                                </div>
-                                <div>
-                                    <h5>Lengkapi Profil</h5>
-                                    <p class="mb-0">Lengkapi informasi profil Anda di dashboard member</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-start">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px;">
-                                    <span>3</span>
-                                </div>
-                                <div>
-                                    <h5>Bagikan Link Referral</h5>
-                                    <p class="mb-0">Mulai bagikan link referral Anda untuk mengundang member baru</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-start">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px;">
-                                    <span>4</span>
-                                </div>
-                                <div>
-                                    <h5>Pantau Perkembangan</h5>
-                                    <p class="mb-0">Pantau perkembangan jaringan dan bonus Anda di dashboard</p>
-                                </div>
-                            </div>
-                        </div>
+
+            <!-- Share Section -->
+            <div class="card border-0 shadow mt-4">
+                <div class="card-body text-center p-4">
+                    <h4 class="mb-4">Bagikan Link Referral Anda</h4>
+                    
+                    <?php 
+                    $referral_link = SITE_URL . '/member/register.php?ref=' . $user_data['referral_code'];
+                    ?>
+                    
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" value="<?php echo $referral_link; ?>" readonly>
+                        <button class="btn btn-primary" type="button" 
+                                onclick="copyToClipboard('<?php echo $referral_link; ?>')"
+                                data-bs-toggle="tooltip" 
+                                title="Salin Link">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="https://wa.me/?text=<?php echo urlencode('Gabung MLM Binary System sekarang! Daftar melalui link: ' . $referral_link); ?>" 
+                           class="btn btn-success" target="_blank">
+                            <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                        </a>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode($referral_link); ?>" 
+                           class="btn btn-primary" target="_blank">
+                            <i class="fab fa-facebook-f me-2"></i>Facebook
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?text=<?php echo urlencode('Gabung MLM Binary System sekarang! Daftar melalui link: ' . $referral_link); ?>" 
+                           class="btn btn-info" target="_blank">
+                            <i class="fab fa-twitter me-2"></i>Twitter
+                        </a>
                     </div>
                 </div>
             </div>
@@ -105,30 +109,22 @@ $referral_link = 'http://' . $_SERVER['HTTP_HOST'] . '/mlm_binary/member/registe
     </div>
 </div>
 
-<script>
-function copyToClipboard(text) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    
-    // Show tooltip
-    const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    tooltips.forEach(tooltip => {
-        const instance = bootstrap.Tooltip.getInstance(tooltip);
-        if (instance) {
-            tooltip.setAttribute('data-bs-original-title', 'Tersalin!');
-            instance.show();
-            
-            setTimeout(() => {
-                tooltip.setAttribute('data-bs-original-title', 'Salin');
-                instance.hide();
-            }, 2000);
-        }
-    });
+<style>
+.fa-check-circle {
+    animation: scale-up 0.5s ease;
 }
-</script>
+
+@keyframes scale-up {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+</style>
 
 <?php require_once '../includes/footer.php'; ?>
